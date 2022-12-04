@@ -25,6 +25,14 @@ impl Move {
             Move::Rock => Move::Paper,
         }
     }
+
+    pub fn to_round_result(&self) -> RoundResult {
+        match *self {
+            Move::Rock => RoundResult::Lose,
+            Move::Paper => RoundResult::Tie,
+            Move::Scissors => RoundResult::Win,
+        }
+    }
 }
 
 impl FromStr for Move {
@@ -65,6 +73,32 @@ pub fn normal() {
                 .collect();
 
             handle_move(moves[0], moves[1]) as i32 + moves[1] as i32
+        })
+        .sum();
+
+    println!("Result: {}", result);
+}
+
+fn handle_move_bonus(enemy: Move, end_result: RoundResult) -> Move {
+    match end_result {
+        RoundResult::Win => enemy.get_stronger(),
+        RoundResult::Tie => enemy.clone(),
+        RoundResult::Lose => enemy.get_weaker(),
+    }
+}
+
+pub fn bonus() {
+    let input = include_str!("input.txt");
+    let result: i32 = input
+        .lines()
+        .map(|line| {
+            let moves: Vec<Move> = line
+                .split(' ')
+                .map(|m| Move::from_str(m).expect("Unknown Move"))
+                .collect();
+
+            handle_move_bonus(moves[0], moves[1].to_round_result()) as i32
+                + moves[1].to_round_result() as i32
         })
         .sum();
 
