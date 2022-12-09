@@ -63,3 +63,75 @@ pub fn normal() {
 
     println!("Result: {result}");
 }
+
+pub fn bonus() {
+    let input = include_str!("input.txt");
+    let trees = input
+        .lines()
+        .map(|line| {
+            line.chars()
+                .map(|c| c.to_digit(10).unwrap() as i32)
+                .collect::<Vec<i32>>()
+        })
+        .collect::<Vec<Vec<i32>>>();
+
+    let mut max_score = 0;
+    for tree_y in 0..trees.len() {
+        for tree_x in 0..trees[tree_y].len() {
+            let tree_height = trees[tree_y][tree_x];
+            let max_x = trees[tree_y].len();
+            let max_y = trees.len();
+
+            // right
+            let mut right = 0;
+            for x in (tree_x + 1)..max_x {
+                if trees[tree_y][x] < tree_height {
+                    right += 1;
+                } else {
+                    right += 1;
+                    break;
+                }
+            }
+
+            // left
+            let mut left = 0;
+            for x in (0..tree_x).rev() {
+                if trees[tree_y][x] < tree_height {
+                    left += 1;
+                } else {
+                    left += 1;
+                    break;
+                }
+            }
+
+            // top
+            let mut top = 0;
+            for y in (0..tree_y).rev() {
+                if trees[y][tree_x] < tree_height {
+                    top += 1;
+                } else {
+                    top += 1;
+                    break;
+                }
+            }
+
+            // bottom
+            let mut bottom = 0;
+            for y in (tree_y + 1)..max_y {
+                if trees[y][tree_x] < tree_height {
+                    bottom += 1;
+                } else {
+                    bottom += 1;
+                    break;
+                }
+            }
+
+            let tree_score = right * left * top * bottom;
+            if tree_score > max_score {
+                max_score = tree_score;
+            }
+        }
+    }
+
+    println!("Result: {max_score}");
+}
