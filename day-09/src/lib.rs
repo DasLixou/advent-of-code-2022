@@ -96,3 +96,72 @@ pub fn normal() {
     let result = visited_fields.len();
     println!("Result: {result}");
 }
+
+pub fn bonus() {
+    let input = include_str!("input.txt");
+    let moves = input
+        .lines()
+        .map(|line| {
+            let data = line.split(' ').collect::<Vec<&str>>();
+            Move::new(data[0], data[1])
+        })
+        .collect::<Vec<Move>>();
+
+    let mut head = IVec2::new(0, 0);
+    let mut ropes = [IVec2::new(0, 0); 9];
+    let mut visited_fields = HashSet::new();
+
+    visited_fields.insert(ropes[8]); // insert start field
+
+    moves.iter().for_each(|m| {
+        let (steps, direction) = m.data();
+        (0..steps).for_each(|_| {
+            head += direction;
+            // rope movement
+            for i in 0..ropes.len() {
+                let target = match i {
+                    h if h == 0 => head,
+                    _ => ropes[i - 1],
+                };
+                let mut rope = &mut ropes[i];
+                if (target - *rope).abs().cmpgt(IVec2::ONE).any() {
+                    // horizontal movement
+                    if rope.y == target.y {
+                        let distance = target.x - rope.x;
+                        if distance > 0 {
+                            rope.x += distance - 1;
+                        } else {
+                            rope.x += distance + 1;
+                        }
+                    }
+                    // vertical movement
+                    else if rope.x == target.x {
+                        let distance = target.y - rope.y;
+                        if distance > 0 {
+                            rope.y += distance - 1;
+                        } else {
+                            rope.y += distance + 1;
+                        }
+                    }
+                    // diagonal movement
+                    else {
+                        let tail_left = rope.x < target.x;
+                        let tail_below = rope.y < target.y;
+                        *rope += match (tail_left, tail_below) {
+                            (true, true) => IVec2::new(1, 1),
+                            (false, true) => IVec2::new(-1, 1),
+                            (true, false) => IVec2::new(1, -1),
+                            (false, false) => IVec2::new(-1, -1),
+                        };
+                    }
+                }
+                if i == 8 {
+                    visited_fields.insert(*rope);
+                }
+            }
+        })
+    });
+
+    let result = visited_fields.len();
+    println!("Result: {result}");
+}
