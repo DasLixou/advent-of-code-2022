@@ -22,29 +22,65 @@ impl FromStr for Instruction {
 pub fn normal() {
     let input = include_str!("input.txt");
     let mut x: i32 = 1;
-    let mut cycle = 0;
+    let mut cycle_index = 0;
     let mut result = 0;
 
     for instruction in input
         .lines()
         .map(|line| Instruction::from_str(line).expect("Coulnd't convert to Instruction"))
     {
-        let mut check_cycle = |value| {
-            cycle += 1;
-            if (cycle - 20) % 40 == 0 {
-                println!("{cycle}");
-                result += cycle * value;
+        let mut cycle = |value| {
+            cycle_index += 1;
+            if (cycle_index - 20) % 40 == 0 {
+                result += cycle_index * value;
             }
         };
+
         match instruction {
-            Instruction::Noop => check_cycle(x),
+            Instruction::Noop => cycle(x),
             Instruction::AddX(value) => {
-                check_cycle(x);
-                check_cycle(x);
+                cycle(x);
+                cycle(x);
                 x += value;
             }
         }
     }
 
     println!("Result: {result}");
+}
+
+pub fn bonus() {
+    let input = include_str!("input.txt");
+    let mut x: i32 = 1;
+    let mut cycle_index = 0;
+
+    for instruction in input
+        .lines()
+        .map(|line| Instruction::from_str(line).expect("Coulnd't convert to Instruction"))
+    {
+        let mut cycle = |value: i32| {
+            let line_index = cycle_index % 40;
+            if (line_index - value).abs() <= 1 {
+                print!("#");
+            } else {
+                print!(".")
+            }
+            cycle_index += 1;
+            if (cycle_index % 40) == 0 {
+                println!();
+            }
+        };
+
+        match instruction {
+            Instruction::Noop => {
+                // cycle
+                cycle(x);
+            }
+            Instruction::AddX(value) => {
+                cycle(x);
+                cycle(x);
+                x += value;
+            }
+        }
+    }
 }
