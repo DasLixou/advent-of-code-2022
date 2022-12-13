@@ -1,6 +1,6 @@
 use std::collections::HashSet;
 
-use glam::{BVec2, IVec2};
+use glam::IVec2;
 
 #[derive(Debug)]
 enum Move {
